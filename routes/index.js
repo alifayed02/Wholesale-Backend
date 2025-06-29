@@ -97,19 +97,19 @@ const registerRoutes = (app) => {
     });
 
     // Fetch data from various Google Sheets
-    app.get('/data/eoc', isInternal, async (req, res) => {
+    app.get('/data/eoc', async (req, res) => {
         try {
             const sheetsConfig = [
                 {
-                    "id": "12l90jOw8SYMeeeqn6qt9xXD1VxQW7rhA6-9jCwtT5MM",
+                    "id": "1q1MTJZOfFpn4lrF-RKPcVbu8pTZ6RbZEjdYe7c7CP7U",
                     "name": "Form Responses 1",
-                    "range": "A1:N",
+                    "range": "A1:O",
                 }
             ];
 
             const keyPath = process.env.ENVIRONMENT === 'production'
-                ? '/etc/secrets/scalingsociety-44f37d53dfcf.json'
-                : path.join(__dirname, '..', 'keys/scalingsociety-44f37d53dfcf.json');
+                ? '/etc/secrets/wholesalelaunchpad-881a8596ee58.json'
+                : path.join(__dirname, '..', 'keys/wholesalelaunchpad-881a8596ee58.json');
 
             const googleAuth = new google.auth.GoogleAuth({
                 keyFile: keyPath,
@@ -131,14 +131,24 @@ const registerRoutes = (app) => {
                     continue;
                 }
 
-                const headers = values[0];
-                const records = values.slice(1).map(row => {
-                    const record = {};
-                    headers.forEach((header, index) => {
-                        record[header] = row[index] || null; // Handle empty cells
-                    });
-                    return record;
+                const dataRows = values.slice(1);
+
+                const records = dataRows.map(row => {
+                    return {
+                        "Timestamp": row[0],
+                        "Prospect Name": row[2],
+                        "Offer Made": row[3],
+                        "Call Outcome": row[4],
+                        "Cash Collected": row[5],
+                        "Revenue Generated": row[6],
+                        "Closer Name": row[8],
+                        "Setter Name": row[9],
+                        "Coach Name": row[10],
+                        "Platform": row[11],
+                        "Funnel": row[12],
+                    }
                 });
+
                 allSheetsData.push(records);
             }
 
@@ -151,59 +161,34 @@ const registerRoutes = (app) => {
 
     app.get('/data/leads', async (req, res) => {
         try {
-            const SPREADSHEET_ID = "1sDrTpTj_PcjsEFERJDwqdfn4dq4-Edbivr2B-1esqto";
+            const SPREADSHEET_ID = "1w3dVgdmargwTJecY4ZhGrmFzmSClrNV4J_9QL3Exo5Q";
 
             // List of sheet (tab) names to extract data from
             const sheetNames = [
-                "Urban Unity inner circle application form (Eban - TikTok FT) ",
-                "Urban Unity inner circle application form (Eban - IG FT) ",
-                "Urban Unity inner circle application form (Eban - YT FT) ",
-                "Urban Unity inner circle application form (Eban - YT direct) ",
-                "Urban Unity inner circle application form (Trey - YT FT)",
-                "Urban Unity inner circle application form (Trey - YT direct)",
-                "Urban Unity inner circle application form (Trey - IG FT)",
-                "Urban Unity inner circle application form (Marsh - TikTok FT) ",
-                "Urban Unity inner circle application form (Marsh - IG FT)",
-                "Urban Unity inner circle application form (cwm)",
-                "Urban Unity inner circle application form (Marsh - emails)",
-                "Urban Unity inner circle application form (Marsh - YT Direct)",
-                "Urban Unity inner circle application form (Marsh - YT FT)",
+                "Wholesale Launchpad Typeform - Email direct - Tanner",
+                "Wholesale Launchpad Typeform - Email direct - Davis ",
+                "Wholesale Launchpad Typeform - DTA TT - Davis",
+                "Wholesale Launchpad Typeform - DTA IG - Davis ",
+                "Wholesale Launchpad Typeform - DTA YT - Davis ",
+                "Wholesale Launchpad Typeform - DTA TT - Tanner ",
+                "Wholesale Launchpad Typeform - DTA IG - Tanner",
+                "Wholesale Launchpad Typeform - DTA YT - Tanner",
             ];
 
             const sources = new Map();
-            sources.set("Urban Unity inner circle application form (Eban - TikTok FT) ", "TikTok");
-            sources.set("Urban Unity inner circle application form (Eban - IG FT) ", "Instagram");
-            sources.set("Urban Unity inner circle application form (Eban - YT FT) ", "YouTube");
-            sources.set("Urban Unity inner circle application form (Eban - YT direct) ", "YouTube");
-            sources.set("Urban Unity inner circle application form (Trey - YT FT)", "YouTube");
-            sources.set("Urban Unity inner circle application form (Trey - YT direct)", "YouTube");
-            sources.set("Urban Unity inner circle application form (Trey - IG FT)", "Instagram");
-            sources.set("Urban Unity inner circle application form (Marsh - TikTok FT) ", "TikTok")
-            sources.set("Urban Unity inner circle application form (Marsh - IG FT)", "Instagram");
-            sources.set("Urban Unity inner circle application form (cwm)", "CWM");
-            sources.set("Urban Unity inner circle application form (Marsh - emails)", "Email");
-            sources.set("Urban Unity inner circle application form (Marsh - YT Direct)", "YouTube");
-            sources.set("Urban Unity inner circle application form (Marsh - YT FT)", "YouTube");
-
-            const coach = new Map();
-            coach.set("Urban Unity inner circle application form (Eban - TikTok FT) ", "Eban");
-            coach.set("Urban Unity inner circle application form (Eban - IG FT) ", "Eban");
-            coach.set("Urban Unity inner circle application form (Eban - YT FT) ", "Eban");
-            coach.set("Urban Unity inner circle application form (Eban - YT direct) ", "Eban");
-            coach.set("Urban Unity inner circle application form (Trey - YT FT)", "Trey");
-            coach.set("Urban Unity inner circle application form (Trey - YT direct)", "Trey");
-            coach.set("Urban Unity inner circle application form (Trey - IG FT)", "Trey");
-            coach.set("Urban Unity inner circle application form (Marsh - TikTok FT) ", "Marshall")
-            coach.set("Urban Unity inner circle application form (Marsh - IG FT)", "Marshall");
-            coach.set("Urban Unity inner circle application form (cwm)", "Marshall");
-            coach.set("Urban Unity inner circle application form (Marsh - emails)", "Marshall");
-            coach.set("Urban Unity inner circle application form (Marsh - YT Direct)", "Marshall");
-            coach.set("Urban Unity inner circle application form (Marsh - YT FT)", "Marshall");
+            sources.set("Wholesale Launchpad Typeform - Email direct - Tanner", "Email");
+            sources.set("Wholesale Launchpad Typeform - Email direct - Davis ", "Email");
+            sources.set("Wholesale Launchpad Typeform - DTA TT - Davis", "TikTok");
+            sources.set("Wholesale Launchpad Typeform - DTA IG - Davis ", "Instagram");
+            sources.set("Wholesale Launchpad Typeform - DTA YT - Davis ", "YouTube");
+            sources.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", "TikTok");
+            sources.set("Wholesale Launchpad Typeform - DTA IG - Tanner", "Instagram");
+            sources.set("Wholesale Launchpad Typeform - DTA YT - Tanner", "YouTube");
 
             // Determine the service account key path depending on the environment
             const keyPath = process.env.ENVIRONMENT === 'production'
-                ? '/etc/secrets/scalingsociety-44f37d53dfcf.json'
-                : path.join(__dirname, '..', 'keys/scalingsociety-44f37d53dfcf.json');
+                ? '/etc/secrets/wholesalelaunchpad-881a8596ee58.json'
+                : path.join(__dirname, '..', 'keys/wholesalelaunchpad-881a8596ee58.json');
 
             const googleAuth = new google.auth.GoogleAuth({
                 keyFile: keyPath,
@@ -219,7 +204,7 @@ const registerRoutes = (app) => {
             const sheetPromises = sheetNames.map(async (sheetName) => {
                 const response = await sheets.spreadsheets.values.get({
                     spreadsheetId: SPREADSHEET_ID,
-                    range: `${sheetName}!A1:Z`, // Fetch columns A through Z
+                    range: `${sheetName}!A1:W`, // Fetch columns A through Z
                 });
 
                 const values = response.data.values;
@@ -232,15 +217,15 @@ const registerRoutes = (app) => {
                 const dataRows = values.slice(1);
 
                 return dataRows.map((row) => ({
-                    "Timestamp": getCell(row, 24),
-                    "First Name": getCell(row, 20),
-                    "Last Name": getCell(row, 21),
-                    "Phone": getCell(row, 22),
-                    "Email": getCell(row, 23),
-                    "Income Replace": getCell(row, 12),  // Column M (0-indexed 12)
-                    "Confidence": getCell(row, 14),      // Column O (0-indexed 14)
+                    "Timestamp": getCell(row, 21),
+                    "First Name": getCell(row, 4),
+                    "Last Name": getCell(row, 5),
+                    "Phone": getCell(row, 6),
+                    "Email": getCell(row, 7),
+                    "Desired Income": getCell(row, 12),
+                    "Current Income": getCell(row, 15),
+                    "Willing to Invest": getCell(row, 18),
                     "Source": sources.get(sheetName),
-                    "Coach": coach.get(sheetName),
                 }));
             });
 

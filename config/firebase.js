@@ -8,11 +8,11 @@ const initializeFirebase = () => {
             if (process.env.ENVIRONMENT === 'production') {
                 console.log('Initializing Firebase in production mode...');
                 // The path to the secret in production environment
-                serviceAccount = '/etc/secrets/urbanunity-d4baf-firebase-adminsdk-fbsvc-1b528a9e8c.json';
+                serviceAccount = '/etc/secrets/wholesalelaunchpad-6708c-firebase-adminsdk-fbsvc-857ed9a66c.json';
             } else {
                 console.log('Initializing Firebase in development mode...');
                 // The path to the key file for local development
-                serviceAccount = './keys/urbanunity-d4baf-firebase-adminsdk-fbsvc-1b528a9e8c.json';
+                serviceAccount = './keys/wholesalelaunchpad-6708c-firebase-adminsdk-fbsvc-857ed9a66c.json';
             }
 
             admin.initializeApp({
