@@ -97,7 +97,7 @@ const registerRoutes = (app) => {
     });
 
     // Fetch data from various Google Sheets
-    app.get('/data/eoc', async (req, res) => {
+    app.get('/data/eoc', isInternal, async (req, res) => {
         try {
             const sheetsConfig = [
                 {
@@ -159,7 +159,7 @@ const registerRoutes = (app) => {
         }
     });
 
-    app.get('/data/leads', async (req, res) => {
+    app.get('/data/leads', isInternal, async (req, res) => {
         try {
             const SPREADSHEET_ID = "1w3dVgdmargwTJecY4ZhGrmFzmSClrNV4J_9QL3Exo5Q";
 
