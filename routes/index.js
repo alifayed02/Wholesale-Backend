@@ -103,7 +103,7 @@ const registerRoutes = (app) => {
                 {
                     "id": "1q1MTJZOfFpn4lrF-RKPcVbu8pTZ6RbZEjdYe7c7CP7U",
                     "name": "Form Responses 1",
-                    "range": "A1:O",
+                    "range": "A1:P",
                 }
             ];
 
@@ -146,6 +146,7 @@ const registerRoutes = (app) => {
                         "Coach Name": row[10],
                         "Platform": row[11],
                         "Funnel": row[12],
+                        "Situation": row[15]
                     }
                 });
 
@@ -226,6 +227,7 @@ const registerRoutes = (app) => {
                     "Current Income": getCell(row, 15),
                     "Willing to Invest": getCell(row, 18),
                     "Source": sources.get(sheetName),
+                    "Funnel": sheetName
                 }));
             });
 
