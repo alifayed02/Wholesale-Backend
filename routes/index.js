@@ -133,22 +133,28 @@ const registerRoutes = (app) => {
 
                 const dataRows = values.slice(1);
 
-                const records = dataRows.map(row => {
-                    return {
-                        "Timestamp": row[0],
-                        "Prospect Name": row[2],
-                        "Offer Made": row[3],
-                        "Call Outcome": row[4],
-                        "Cash Collected": row[5],
-                        "Revenue Generated": row[6],
-                        "Closer Name": row[8],
-                        "Setter Name": row[9],
-                        "Coach Name": row[10],
-                        "Platform": row[11],
-                        "Funnel": row[12],
-                        "Situation": row[15]
+                const records = dataRows.reduce((acc, row) => {
+                    const record = {
+                        "Timestamp": row[0] || '',
+                        "Prospect Name": row[2] || '',
+                        "Offer Made": row[3] || '',
+                        "Call Outcome": row[4] || '',
+                        "Cash Collected": row[5] || '',
+                        "Revenue Generated": row[6] || '',
+                        "Closer Name": row[8] || '',
+                        "Setter Name": row[9] || '',
+                        "Coach Name": row[10] || '',
+                        "Platform": row[11] || '',
+                        "Funnel": row[12] || '',
+                        "Situation": row[15] || ''
+                    };
+
+                    const allEmpty = Object.values(record).every(val => val === '' || val === null || val === undefined);
+                    if (!allEmpty) {
+                        acc.push(record);
                     }
-                });
+                    return acc;
+                }, []);
 
                 allSheetsData.push(records);
             }
@@ -185,6 +191,16 @@ const registerRoutes = (app) => {
             sources.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", "TikTok");
             sources.set("Wholesale Launchpad Typeform - DTA IG - Tanner", "Instagram");
             sources.set("Wholesale Launchpad Typeform - DTA YT - Tanner", "YouTube");
+
+            const funnels = new Map();
+            funnels.set("Wholesale Launchpad Typeform - Email direct - Tanner", "Email direct - Tanner");
+            funnels.set("Wholesale Launchpad Typeform - Email direct - Davis ", "Email direct - Davis");
+            funnels.set("Wholesale Launchpad Typeform - DTA TT - Davis", "DTA TT - Davis");
+            funnels.set("Wholesale Launchpad Typeform - DTA IG - Davis ", "DTA IG - Davis");
+            funnels.set("Wholesale Launchpad Typeform - DTA YT - Davis ", "DTA YT - Davis");
+            funnels.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", "DTA TT - Tanner");
+            funnels.set("Wholesale Launchpad Typeform - DTA IG - Tanner", "DTA IG - Tanner");
+            funnels.set("Wholesale Launchpad Typeform - DTA YT - Tanner", "DTA YT - Tanner");
 
             // Determine the service account key path depending on the environment
             const keyPath = process.env.ENVIRONMENT === 'production'
@@ -227,7 +243,7 @@ const registerRoutes = (app) => {
                     "Current Income": getCell(row, 15),
                     "Willing to Invest": getCell(row, 18),
                     "Source": sources.get(sheetName),
-                    "Funnel": sheetName
+                    "Funnel": funnels.get(sheetName)
                 }));
             });
 
