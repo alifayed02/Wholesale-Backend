@@ -182,26 +182,48 @@ const registerRoutes = (app) => {
                 "Wholesale Launchpad Typeform - DTA YT - Tanner",
             ];
 
-            const sources = new Map();
-            sources.set("Wholesale Launchpad Typeform - Email direct - Tanner", "Email");
-            sources.set("Wholesale Launchpad Typeform - Email direct - Davis ", "Email");
-            sources.set("Wholesale Launchpad Typeform - DTA TT - Davis", "TikTok");
-            sources.set("Wholesale Launchpad Typeform - DTA IG - Davis ", "Instagram");
-            sources.set("Wholesale Launchpad Typeform - DTA YT - Davis ", "YouTube");
-            sources.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", "TikTok");
-            sources.set("Wholesale Launchpad Typeform - DTA IG - Tanner", "Instagram");
-            sources.set("Wholesale Launchpad Typeform - DTA YT - Tanner", "YouTube");
-
-            const funnels = new Map();
-            funnels.set("Wholesale Launchpad Typeform - Email direct - Tanner", "Email direct - Tanner");
-            funnels.set("Wholesale Launchpad Typeform - Email direct - Davis ", "Email direct - Davis");
-            funnels.set("Wholesale Launchpad Typeform - DTA TT - Davis", "DTA TT - Davis");
-            funnels.set("Wholesale Launchpad Typeform - DTA IG - Davis ", "DTA IG - Davis");
-            funnels.set("Wholesale Launchpad Typeform - DTA YT - Davis ", "DTA YT - Davis");
-            funnels.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", "DTA TT - Tanner");
-            funnels.set("Wholesale Launchpad Typeform - DTA IG - Tanner", "DTA IG - Tanner");
-            funnels.set("Wholesale Launchpad Typeform - DTA YT - Tanner", "DTA YT - Tanner");
-
+            const sheetMeta = new Map();
+            sheetMeta.set("Wholesale Launchpad Typeform - Email direct - Tanner", {
+                source: "Email",
+                funnel: "Email direct - Tanner",
+                coach: "Tanner"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - Email direct - Davis ", {
+                source: "Email",
+                funnel: "Email direct - Davis",
+                coach: "Davis"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA TT - Davis", {
+                source: "TikTok",
+                funnel: "DTA TT - Davis",
+                coach: "Davis"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA IG - Davis ", {
+                source: "Instagram",
+                funnel: "DTA IG - Davis",
+                coach: "Davis"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA YT - Davis ", {
+                source: "YouTube",
+                funnel: "DTA YT - Davis",
+                coach: "Davis"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", {
+                source: "TikTok",
+                funnel: "DTA TT - Tanner",
+                coach: "Tanner"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA IG - Tanner", {
+                source: "Instagram",
+                funnel: "DTA IG - Tanner",
+                coach: "Tanner"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - DTA YT - Tanner", {
+                source: "YouTube",
+                funnel: "DTA YT - Tanner",
+                coach: "Tanner"
+            });
+            
             // Determine the service account key path depending on the environment
             const keyPath = process.env.ENVIRONMENT === 'production'
                 ? '/etc/secrets/wholesalelaunchpad-881a8596ee58.json'
@@ -242,8 +264,9 @@ const registerRoutes = (app) => {
                     "Desired Income": getCell(row, 12),
                     "Current Income": getCell(row, 15),
                     "Willing to Invest": getCell(row, 18),
-                    "Source": sources.get(sheetName),
-                    "Funnel": funnels.get(sheetName)
+                    "Source": sheetMeta.get(sheetName).source,
+                    "Funnel": sheetMeta.get(sheetName).funnel,
+                    "Coach": sheetMeta.get(sheetName).coach
                 }));
             });
 
