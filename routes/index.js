@@ -3,6 +3,12 @@ const admin = require('firebase-admin');
 const { google } = require('googleapis');
 const path = require('path');
 const axios = require('axios');
+const { LRUCache } = require('lru-cache');
+
+// Initialize LRU caches with a 2-minute TTL (in milliseconds)
+const cacheOptions = { max: 100, ttl: 1000 * 60 * 2 }; // 2 minutes
+const eocCache = new LRUCache(cacheOptions);
+const leadsCache = new LRUCache(cacheOptions);
 
 const auth = admin.auth();
 
@@ -99,6 +105,12 @@ const registerRoutes = (app) => {
     // Fetch data from various Google Sheets
     app.get('/data/eoc', isInternal, async (req, res) => {
         try {
+            // Return cached response when available
+            const cached = eocCache.get('eoc');
+            if (cached) {
+                return res.json(cached);
+            }
+
             const sheetsConfig = [
                 {
                     "id": "1q1MTJZOfFpn4lrF-RKPcVbu8pTZ6RbZEjdYe7c7CP7U",
@@ -159,6 +171,8 @@ const registerRoutes = (app) => {
                 allSheetsData.push(records);
             }
 
+            // Cache and return the fresh response
+            eocCache.set('eoc', allSheetsData);
             return res.json(allSheetsData);
         } catch (error) {
             console.error("Error in /data route:", error.message);
@@ -168,6 +182,12 @@ const registerRoutes = (app) => {
 
     app.get('/data/leads', isInternal, async (req, res) => {
         try {
+            // Return cached response when available
+            const cached = leadsCache.get('leads');
+            if (cached) {
+                return res.json(cached);
+            }
+
             const SPREADSHEET_ID = "1w3dVgdmargwTJecY4ZhGrmFzmSClrNV4J_9QL3Exo5Q";
 
             // List of sheet (tab) names to extract data from
@@ -273,6 +293,8 @@ const registerRoutes = (app) => {
             // Wait for all sheet processing to finish and flatten the results
             const results = (await Promise.all(sheetPromises)).flat();
 
+            // Cache and return the fresh response
+            leadsCache.set('leads', results);
             return res.json(results);
         } catch (error) {
             console.error("Error in /data/leads route:", error.message);
