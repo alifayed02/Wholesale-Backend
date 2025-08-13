@@ -190,18 +190,6 @@ const registerRoutes = (app) => {
 
             const SPREADSHEET_ID = "1w3dVgdmargwTJecY4ZhGrmFzmSClrNV4J_9QL3Exo5Q";
 
-            // List of sheet (tab) names to extract data from
-            const sheetNames = [
-                "Wholesale Launchpad Typeform - Email direct - Tanner",
-                "Wholesale Launchpad Typeform - Email direct - Davis ",
-                "Wholesale Launchpad Typeform - DTA TT - Davis",
-                "Wholesale Launchpad Typeform - DTA IG - Davis ",
-                "Wholesale Launchpad Typeform - DTA YT - Davis ",
-                "Wholesale Launchpad Typeform - DTA TT - Tanner ",
-                "Wholesale Launchpad Typeform - DTA IG - Tanner",
-                "Wholesale Launchpad Typeform - DTA YT - Tanner",
-            ];
-
             const sheetMeta = new Map();
             sheetMeta.set("Wholesale Launchpad Typeform - Email direct - Tanner", {
                 source: "Email",
@@ -243,6 +231,16 @@ const registerRoutes = (app) => {
                 funnel: "DTA YT - Tanner",
                 coach: "Tanner"
             });
+            sheetMeta.set("Wholesale Launchpad Typeform - IG direct CTA - Tanner", {
+                source: "Instagram",
+                funnel: "IG direct CTA - Tanner",
+                coach: "Tanner"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - IG direct CTA - Davis ", {
+                source: "Instagram",
+                funnel: "IG direct CTA - Davis",
+                coach: "Davis"
+            });
             
             // Determine the service account key path depending on the environment
             const keyPath = process.env.ENVIRONMENT === 'production'
@@ -259,8 +257,8 @@ const registerRoutes = (app) => {
             // Helper to safely access a cell by index, returning null if out of bounds
             const getCell = (row, index) => (row.length > index ? row[index] || null : null);
 
-            // Process each sheet concurrently instead of sequentially
-            const sheetPromises = sheetNames.map(async (sheetName) => {
+			// Process each sheet concurrently instead of sequentially (using keys from sheetMeta)
+			const sheetPromises = Array.from(sheetMeta.keys()).map(async (sheetName) => {
                 const response = await sheets.spreadsheets.values.get({
                     spreadsheetId: SPREADSHEET_ID,
                     range: `${sheetName}!A1:W`, // Fetch columns A through Z
