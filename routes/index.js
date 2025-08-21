@@ -194,53 +194,75 @@ const registerRoutes = (app) => {
             sheetMeta.set("Wholesale Launchpad Typeform - Email direct - Tanner", {
                 source: "Email",
                 funnel: "Email direct - Tanner",
-                coach: "Tanner"
+                coach: "Tanner",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - Email direct - Davis ", {
                 source: "Email",
                 funnel: "Email direct - Davis",
-                coach: "Davis"
+                coach: "Davis",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA TT - Davis", {
                 source: "TikTok",
                 funnel: "DTA TT - Davis",
-                coach: "Davis"
+                coach: "Davis",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA IG - Davis ", {
                 source: "Instagram",
                 funnel: "DTA IG - Davis",
-                coach: "Davis"
+                coach: "Davis",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA YT - Davis ", {
                 source: "YouTube",
                 funnel: "DTA YT - Davis",
-                coach: "Davis"
+                coach: "Davis",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA TT - Tanner ", {
                 source: "TikTok",
                 funnel: "DTA TT - Tanner",
-                coach: "Tanner"
+                coach: "Tanner",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA IG - Tanner", {
                 source: "Instagram",
                 funnel: "DTA IG - Tanner",
-                coach: "Tanner"
+                coach: "Tanner",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - DTA YT - Tanner", {
                 source: "YouTube",
                 funnel: "DTA YT - Tanner",
-                coach: "Tanner"
+                coach: "Tanner",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - IG direct CTA - Tanner", {
                 source: "Instagram",
                 funnel: "IG direct CTA - Tanner",
-                coach: "Tanner"
+                coach: "Tanner",
+                type: "1"
             });
             sheetMeta.set("Wholesale Launchpad Typeform - IG direct CTA - Davis ", {
                 source: "Instagram",
                 funnel: "IG direct CTA - Davis",
-                coach: "Davis"
+                coach: "Davis",
+                type: "1"
             });
+            sheetMeta.set("Wholesale Launchpad Typeform - Ads DTA - Davis ", {
+                source: "Ads",
+                funnel: "Ads DTA - Davis",
+                coach: "Davis",
+                type: "2"
+            });
+            sheetMeta.set("Wholesale Launchpad Typeform - Ads DTA - Tanner", {
+                source: "Ads",
+                funnel: "Ads DTA - Tanner",
+                coach: "Tanner",
+                type: "2"
+            })
             
             // Determine the service account key path depending on the environment
             const keyPath = process.env.ENVIRONMENT === 'production'
@@ -273,19 +295,42 @@ const registerRoutes = (app) => {
                 // Skip header row (index 0)
                 const dataRows = values.slice(1);
 
-                return dataRows.map((row) => ({
-                    "Timestamp": getCell(row, 21),
-                    "First Name": getCell(row, 4),
-                    "Last Name": getCell(row, 5),
-                    "Phone": getCell(row, 6),
-                    "Email": getCell(row, 7),
-                    "Desired Income": getCell(row, 12),
-                    "Current Income": getCell(row, 15),
-                    "Willing to Invest": getCell(row, 18),
-                    "Source": sheetMeta.get(sheetName).source,
-                    "Funnel": sheetMeta.get(sheetName).funnel,
-                    "Coach": sheetMeta.get(sheetName).coach
-                }));
+                // Determine sheet type (defaults to "1" if not provided)
+                const sheetType = sheetMeta.get(sheetName).type || "1";
+
+                if (sheetType === "1") {
+                    // Existing processing for Type 1 sheets
+                    return dataRows.map((row) => ({
+                        "Timestamp": getCell(row, 21),
+                        "First Name": getCell(row, 4),
+                        "Last Name": getCell(row, 5),
+                        "Phone": getCell(row, 6),
+                        "Email": getCell(row, 7),
+                        "Desired Income": getCell(row, 12),
+                        "Current Income": getCell(row, 15),
+                        "Willing to Invest": getCell(row, 18),
+                        "Source": sheetMeta.get(sheetName).source,
+                        "Funnel": sheetMeta.get(sheetName).funnel,
+                        "Coach": sheetMeta.get(sheetName).coach
+                    }));
+                } else if (sheetType === "2") {
+                    return dataRows.map((row) => ({
+                        "Timestamp": getCell(row, 16),
+                        "First Name": getCell(row, 0),
+                        "Last Name": getCell(row, 1),
+                        "Phone": getCell(row, 2),
+                        "Email": getCell(row, 3),
+                        "Desired Income": getCell(row, 6),
+                        "Current Income": getCell(row, 7),
+                        "Willing to Invest": getCell(row, 8),
+                        "Source": sheetMeta.get(sheetName).source,
+                        "Funnel": sheetMeta.get(sheetName).funnel,
+                        "Coach": sheetMeta.get(sheetName).coach
+                    }));
+                }
+
+                // Fallback in case sheet type is unrecognized
+                return [];
             });
 
             // Wait for all sheet processing to finish and flatten the results
